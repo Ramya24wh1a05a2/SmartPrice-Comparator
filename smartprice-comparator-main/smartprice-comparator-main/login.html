@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SmartPrice – Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050a14;
+  --surface:rgba(255,255,255,0.04);
+  --border:rgba(255,255,255,0.10);
+  --accent:#00d4ff;
+  --accent2:#7c3aed;
+  --gold:#f59e0b;
+  --green:#10b981;
+  --red:#ef4444;
+  --text:#f0f4ff;
+  --muted:#8892a4;
+}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+/* ── animated background ── */
+.bg-wrap{position:fixed;inset:0;z-index:0;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.35;animation:float 8s ease-in-out infinite;}
+.orb1{width:600px;height:600px;background:radial-gradient(circle,#7c3aed,transparent);top:-200px;left:-200px;animation-delay:0s;}
+.orb2{width:500px;height:500px;background:radial-gradient(circle,#00d4ff,transparent);bottom:-150px;right:-150px;animation-delay:2s;}
+.orb3{width:400px;height:400px;background:radial-gradient(circle,#f59e0b,transparent);top:40%;left:40%;animation-delay:4s;}
+@keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.05);}}
+.grid-lines{
+  position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+/* ── card ── */
+.card-wrap{position:relative;z-index:10;width:100%;max-width:460px;padding:20px;}
+.card{
+  background:rgba(10,18,35,0.85);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:48px 44px;
+  backdrop-filter:blur(24px);
+  box-shadow:0 0 80px rgba(0,212,255,0.07), 0 40px 80px rgba(0,0,0,0.6);
+  animation:cardIn .6s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(40px) scale(.97);}to{opacity:1;transform:none;}}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:32px;}
+.logo-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,#7c3aed,#00d4ff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;box-shadow:0 0 24px rgba(0,212,255,0.35);
+}
+.logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--text);}
+.logo-text span{color:var(--accent);}
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--text);margin-bottom:6px;}
+.subtitle{color:var(--muted);font-size:14px;margin-bottom:32px;}
+/* tabs */
+.tabs{display:flex;background:rgba(255,255,255,0.04);border-radius:12px;padding:4px;margin-bottom:28px;border:1px solid var(--border);}
+.tab{flex:1;padding:10px;border:none;border-radius:9px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;}
+.tab.active{background:linear-gradient(135deg,#7c3aed,#00d4ff);color:#fff;box-shadow:0 4px 16px rgba(0,212,255,0.25);}
+/* form */
+.form-group{margin-bottom:18px;}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.input-wrap{position:relative;}
+.input-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);}
+input[type=text],input[type=email],input[type=password]{
+  width:100%;padding:13px 14px 13px 42px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  border-radius:12px;color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:15px;
+  transition:all .2s;outline:none;
+}
+input:focus{border-color:var(--accent);background:rgba(0,212,255,0.05);box-shadow:0 0 0 3px rgba(0,212,255,0.12);}
+input.error{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(239,68,68,0.12)!important;}
+input.valid{border-color:var(--green)!important;}
+.eye-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;}
+.field-error{color:var(--red);font-size:12px;margin-top:6px;display:none;}
+.field-error.show{display:block;}
+/* password strength */
+.strength-bar{height:4px;border-radius:4px;background:rgba(255,255,255,0.08);margin-top:8px;overflow:hidden;display:none;}
+.strength-fill{height:100%;border-radius:4px;transition:all .3s;width:0%;}
+.strength-text{font-size:11px;margin-top:4px;display:none;}
+/* submit btn */
+.btn{
+  width:100%;padding:14px;margin-top:8px;
+  background:linear-gradient(135deg,#7c3aed,#00d4ff);
+  border:none;border-radius:12px;
+  color:#fff;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;
+  cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,212,255,0.3);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.btn .spinner{width:20px;height:20px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+/* social btns */
+.socials{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.social-btn{
+  padding:11px;border:1px solid var(--border);border-radius:11px;
+  background:rgba(255,255,255,0.04);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;
+}
+.social-btn:hover{background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,.2);}
+/* toast */
+.toast{
+  position:fixed;top:24px;right:24px;z-index:999;
+  padding:14px 20px;border-radius:12px;
+  font-size:14px;font-weight:500;
+  transform:translateX(120%);transition:transform .35s cubic-bezier(.16,1,.3,1);
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  max-width:340px;
+}
+.toast.show{transform:translateX(0);}
+.toast.success{background:#064e3b;border:1px solid #10b981;color:#6ee7b7;}
+.toast.error{background:#450a0a;border:1px solid #ef4444;color:#fca5a5;}
+/* demo badge */
+.demo-accounts{
+  margin-top:24px;padding:14px;
+  background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.2);
+  border-radius:12px;
+}
+.demo-accounts h4{font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.demo-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.demo-row:last-child{margin-bottom:0;}
+.demo-creds{font-size:12px;color:var(--muted);}
+.demo-creds b{color:var(--text);}
+.use-demo{
+  font-size:11px;color:var(--accent);font-weight:600;
+  background:none;border:none;cursor:pointer;
+  text-decoration:underline;text-underline-offset:2px;
+}
+</style>
+</head>
+<body>
+<div class="bg-wrap">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="grid-lines"></div>
+</div>
+
+<div class="card-wrap">
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">🛒</div>
+    <div class="logo-text">Smart<span>Price</span></div>
+  </div>
+  <h1 id="formTitle">Welcome back</h1>
+  <p class="subtitle" id="formSubtitle">Sign in to compare prices across all platforms</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('login')">Login</button>
+    <button class="tab" onclick="switchTab('register')">Register</button>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="loginForm">
+    <div class="form-group">
+      <label>Email Address</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <input type="email" id="loginEmail" placeholder="you@example.com" oninput="validateLoginEmail()"/>
+      </div>
+      <div class="field-error" id="loginEmailErr"></div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <input type="password" id="loginPassword" placeholder="Enter your password" oninput="validateLoginPwd()"/>
+        <button class="eye-btn" onclick="togglePwd('loginPassword',this)" type="button">👁</button>
+      </div>
+      <div class="field-error" id="loginPwdErr"></div>
+    </div>
+    <button class="btn" id="loginBtn" onclick="handleLogin()">
+      <span class="btn-text">Sign In →</span>
+      <div class="spinner" id="loginSpinner"></div>
+    </button>
+    <div class="divider">or continue with</div>
+    <div class="socials">
+      <button class="social-btn" onclick="fillDemo('demo@smartprice.in','Demo@1234')">🎭 Demo Account</button>
+      <button class="social-btn" onclick="fillDemo('test@example.com','Test@5678')">🧪 Test Account</button>
+    </div>
+  </div>
+
+  <!-- REGISTER FORM -->
+  <div id="registerForm" style="display:none;">
+    <div class="form-group">
+      <label>Full Name</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <input type="text" id="regName" placeholder="Rahul Sharma" oninput="validateRegName()"/>
+      </div>
+      <div class="field-error" id="regNameErr"></div>
+    </div>
+    <div class="form-group">
+      <label>Email Address</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        <input type="email" id="regEmail" placeholder="you@example.com" oninput="validateRegEmail()"/>
+      </div>
+      <div class="field-error" id="regEmailErr"></div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <input type="password" id="regPassword" placeholder="Min 8 chars, 1 uppercase, 1 number" oninput="checkStrength()"/>
+        <button class="eye-btn" onclick="togglePwd('regPassword',this)" type="button">👁</button>
+      </div>
+      <div class="strength-bar" id="strengthBar"><div class="strength-fill" id="strengthFill"></div></div>
+      <div class="strength-text" id="strengthText"></div>
+      <div class="field-error" id="regPwdErr"></div>
+    </div>
+    <button class="btn" id="regBtn" onclick="handleRegister()">
+      <span class="btn-text">Create Account →</span>
+      <div class="spinner" id="regSpinner"></div>
+    </button>
+  </div>
+
+  <!-- demo accounts -->
+  <div class="demo-accounts" id="demoBox">
+    <h4>🔑 Demo Credentials</h4>
+    <div class="demo-row">
+      <span class="demo-creds"><b>demo@smartprice.in</b> / Demo@1234</span>
+      <button class="use-demo" onclick="fillDemo('demo@smartprice.in','Demo@1234')">Use</button>
+    </div>
+    <div class="demo-row">
+      <span class="demo-creds"><b>test@example.com</b> / Test@5678</span>
+      <button class="use-demo" onclick="fillDemo('test@example.com','Test@5678')">Use</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let activeTab='login';
+
+function switchTab(tab){
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+  document.getElementById('demoBox').style.display=tab==='login'?'block':'none';
+  document.getElementById('formTitle').textContent=tab==='login'?'Welcome back':'Create account';
+  document.getElementById('formSubtitle').textContent=tab==='login'?'Sign in to compare prices across all platforms':'Join SmartPrice and start saving money today';
+}
+
+function togglePwd(id,btn){
+  const el=document.getElementById(id);
+  el.type=el.type==='password'?'text':'password';
+  btn.textContent=el.type==='password'?'👁':'🙈';
+}
+
+function fillDemo(email,pwd){
+  document.getElementById('loginEmail').value=email;
+  document.getElementById('loginPassword').value=pwd;
+  document.getElementById('loginEmail').classList.add('valid');
+  document.getElementById('loginPassword').classList.add('valid');
+}
+
+// ── Validators ──────────────────────────────────────────────────────────────
+function showErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.add('show');}
+function clearErr(id){const el=document.getElementById(id);el.textContent='';el.classList.remove('show');}
+function markField(id,ok){document.getElementById(id).className='input-wrap';const el=document.querySelector('#'+id.replace('Err','')||document.getElementById('loginEmail'));/* */}
+
+function validateLoginEmail(){
+  const v=document.getElementById('loginEmail').value.trim();
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const inp=document.getElementById('loginEmail');
+  if(!v){showErr('loginEmailErr','Email is required.');inp.className='error';return false;}
+  if(!re.test(v)){showErr('loginEmailErr','Enter a valid email address.');inp.className='error';return false;}
+  clearErr('loginEmailErr');inp.classList.remove('error');inp.classList.add('valid');return true;
+}
+function validateLoginPwd(){
+  const v=document.getElementById('loginPassword').value;
+  const inp=document.getElementById('loginPassword');
+  if(!v){showErr('loginPwdErr','Password is required.');inp.className='error';return false;}
+  if(v.length<6){showErr('loginPwdErr','Password must be at least 6 characters.');inp.className='error';return false;}
+  clearErr('loginPwdErr');inp.classList.remove('error');inp.classList.add('valid');return true;
+}
+function validateRegName(){
+  const v=document.getElementById('regName').value.trim();
+  const inp=document.getElementById('regName');
+  if(!v){showErr('regNameErr','Full name is required.');inp.className='error';return false;}
+  if(v.length<2){showErr('regNameErr','Name must be at least 2 characters.');inp.className='error';return false;}
+  clearErr('regNameErr');inp.classList.remove('error');inp.classList.add('valid');return true;
+}
+function validateRegEmail(){
+  const v=document.getElementById('regEmail').value.trim();
+  const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const inp=document.getElementById('regEmail');
+  if(!v){showErr('regEmailErr','Email is required.');inp.className='error';return false;}
+  if(!re.test(v)){showErr('regEmailErr','Enter a valid email address.');inp.className='error';return false;}
+  clearErr('regEmailErr');inp.classList.remove('error');inp.classList.add('valid');return true;
+}
+function checkStrength(){
+  const v=document.getElementById('regPassword').value;
+  const bar=document.getElementById('strengthBar');const fill=document.getElementById('strengthFill');const txt=document.getElementById('strengthText');
+  bar.style.display='block';txt.style.display='block';
+  let score=0;
+  if(v.length>=8)score++;if(/[A-Z]/.test(v))score++;if(/[0-9]/.test(v))score++;if(/[^a-zA-Z0-9]/.test(v))score++;
+  const levels=[{w:'25%',c:'#ef4444',t:'Weak'},{w:'50%',c:'#f59e0b',t:'Fair'},{w:'75%',c:'#3b82f6',t:'Good'},{w:'100%',c:'#10b981',t:'Strong'}];
+  const l=levels[Math.max(0,score-1)];
+  fill.style.width=v?l.w:'0%';fill.style.background=l.c;
+  txt.textContent=v?`Strength: ${l.t}`:'';txt.style.color=v?l.c:'';
+  const inp=document.getElementById('regPassword');
+  if(score<2&&v.length>0){showErr('regPwdErr','Add uppercase letters, numbers, or symbols.');inp.className='error';return false;}
+  if(v.length>0&&v.length<8){showErr('regPwdErr','Password must be at least 8 characters.');inp.className='error';return false;}
+  clearErr('regPwdErr');if(v){inp.classList.remove('error');inp.classList.add('valid');}return score>=2;
+}
+
+// ── API calls ────────────────────────────────────────────────────────────────
+function setLoading(btnId,spinnerId,loading){
+  const btn=document.getElementById(btnId);
+  const sp=document.getElementById(spinnerId);
+  const tx=btn.querySelector('.btn-text');
+  btn.disabled=loading;tx.style.display=loading?'none':'inline';sp.style.display=loading?'block':'none';
+}
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.innerHTML=(type==='success'?'✅ ':'❌ ')+msg;
+  t.className='toast '+type+' show';
+  setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+async function handleLogin(){
+  if(!validateLoginEmail()||!validateLoginPwd())return;
+  setLoading('loginBtn','loginSpinner',true);
+  try{
+    const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('loginEmail').value.trim().toLowerCase(),password:document.getElementById('loginPassword').value})});
+    const d=await r.json();
+    if(d.success){showToast(`Welcome back, ${d.name}!`,'success');setTimeout(()=>window.location.href=d.redirect,800);}
+    else{showToast(d.message,'error');setLoading('loginBtn','loginSpinner',false);}
+  }catch(e){showToast('Connection error. Please try again.','error');setLoading('loginBtn','loginSpinner',false);}
+}
+
+async function handleRegister(){
+  if(!validateRegName()||!validateRegEmail()||!checkStrength())return;
+  setLoading('regBtn','regSpinner',true);
+  try{
+    const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('regName').value.trim(),email:document.getElementById('regEmail').value.trim().toLowerCase(),password:document.getElementById('regPassword').value})});
+    const d=await r.json();
+    if(d.success){showToast(`Account created! Welcome, ${d.name}!`,'success');setTimeout(()=>window.location.href=d.redirect,800);}
+    else{showToast(d.message,'error');setLoading('regBtn','regSpinner',false);}
+  }catch(e){showToast('Connection error. Please try again.','error');setLoading('regBtn','regSpinner',false);}
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){activeTab==='login'?handleLogin():handleRegister();}});
+</script>
+</body>
+</html>
