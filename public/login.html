@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SmartPrice - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Cabinet+Grotesk:wght@400;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--bg:#06080f;--card:rgba(12,16,28,.92);--b:rgba(255,255,255,.08);--ac:#6366f1;--ac2:#22d3ee;--gr:#10b981;--re:#f43f5e;--tx:#f1f5f9;--mu:#64748b;--go:#f59e0b;}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bg{position:fixed;inset:0;}
+.mesh{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 20%,rgba(99,102,241,.18),transparent),radial-gradient(ellipse 60% 80% at 80% 80%,rgba(34,211,238,.12),transparent);}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(99,102,241,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.06) 1px,transparent 1px);background-size:40px 40px;}
+.wrap{position:relative;z-index:10;width:100%;max-width:440px;padding:16px;}
+.card{background:var(--card);border:1px solid var(--b);border-radius:20px;padding:44px 40px;backdrop-filter:blur(32px);box-shadow:0 32px 64px rgba(0,0,0,.7);animation:up .5s ease both;}
+@keyframes up{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:none;}}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;}
+.li{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--ac),var(--ac2));display:flex;align-items:center;justify-content:center;font-size:19px;}
+.lt{font-family:'Cabinet Grotesk',sans-serif;font-size:19px;font-weight:800;color:var(--tx);}
+.lt span{color:var(--ac2);}
+h1{font-family:'Cabinet Grotesk',sans-serif;font-size:24px;font-weight:800;color:var(--tx);margin-bottom:4px;}
+.sub{color:var(--mu);font-size:13px;margin-bottom:28px;}
+.tabs{display:flex;background:rgba(255,255,255,.04);border-radius:10px;padding:3px;margin-bottom:24px;border:1px solid var(--b);}
+.tab{flex:1;padding:9px;border:none;border-radius:8px;background:transparent;color:var(--mu);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.tab.active{background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;}
+.fg{margin-bottom:14px;}
+label{display:block;font-size:11px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
+input[type=text],input[type=email],input[type=password]{width:100%;padding:12px 14px;background:rgba(255,255,255,.05);border:1px solid var(--b);border-radius:10px;color:var(--tx);font-family:'Space Grotesk',sans-serif;font-size:14px;outline:none;transition:all .2s;}
+input:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+.iw{position:relative;}
+.eb{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mu);cursor:pointer;font-size:14px;}
+.btn{width:100%;padding:13px;margin-top:6px;background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;border-radius:10px;color:#fff;font-family:'Cabinet Grotesk',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(99,102,241,.4);}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+.sp{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;margin:0 auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.or{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--mu);font-size:12px;}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--b);}
+.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;transform:translateX(110%);transition:transform .3s ease;min-width:200px;}
+.toast.show{transform:translateX(0);}
+.toast-s{background:#064e3b;border:1px solid #10b981;color:#6ee7b7;}
+.toast-e{background:#4c0519;border:1px solid #f43f5e;color:#fda4af;}
+</style></head>
+<body>
+<div class="bg"><div class="mesh"></div><div class="grid"></div></div>
+<div class="wrap"><div class="card">
+  <div class="logo"><div class="li">&#128722;</div><div class="lt">Smart<span>Price</span></div></div>
+  <h1 id="fT">Welcome back</h1>
+  <p class="sub" id="fS">Sign in to compare prices and predict future deals</p>
+  <div class="tabs">
+    <button class="tab active" onclick="sw('l')">Login</button>
+    <button class="tab" onclick="sw('r')">Register</button>
+  </div>
+  <div id="lF">
+    <div class="fg"><label>Email</label><div class="iw"><input type="email" id="lE" placeholder="you@example.com"/></div></div>
+    <div class="fg"><label>Password</label><div class="iw"><input type="password" id="lP" placeholder="Your password"/><button class="eb" onclick="tp('lP',this)" type="button">&#128065;</button></div></div>
+    <button class="btn" id="lB" onclick="doL()"><span id="lBT">Sign In &rarr;</span><div class="sp" id="lS"></div></button>
+  </div>
+  <div id="rF" style="display:none;">
+    <div class="fg"><label>Full Name</label><div class="iw"><input type="text" id="rN" placeholder="Rahul Sharma"/></div></div>
+    <div class="fg"><label>Email</label><div class="iw"><input type="email" id="rE" placeholder="you@example.com"/></div></div>
+    <div class="fg"><label>Password</label><div class="iw"><input type="password" id="rP" placeholder="Min 8 characters"/><button class="eb" onclick="tp('rP',this)" type="button">&#128065;</button></div></div>
+    <button class="btn" id="rB" onclick="doR()"><span id="rBT">Create Account &rarr;</span><div class="sp" id="rS"></div></button>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+var at = 'l';
+function sw(t) {
+  at = t;
+  var tabs = document.querySelectorAll('.tab');
+  tabs[0].classList.toggle('active', t === 'l');
+  tabs[1].classList.toggle('active', t === 'r');
+  document.getElementById('lF').style.display = t === 'l' ? 'block' : 'none';
+  document.getElementById('rF').style.display = t === 'r' ? 'block' : 'none';
+  document.getElementById('fT').textContent = t === 'l' ? 'Welcome back' : 'Create account';
+  document.getElementById('fS').textContent = t === 'l' ? 'Sign in to compare prices and predict deals' : 'Join SmartPrice and start saving today';
+}
+function tp(id, b) {
+  var el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  b.textContent = el.type === 'password' ? String.fromCodePoint(128065) : String.fromCodePoint(128584);
+}
+function sl(btnId, spId, loading) {
+  var btn = document.getElementById(btnId);
+  var sp = document.getElementById(spId);
+  var txt = document.getElementById(btnId === 'lB' ? 'lBT' : 'rBT');
+  btn.disabled = loading;
+  txt.style.display = loading ? 'none' : 'inline';
+  sp.style.display = loading ? 'block' : 'none';
+}
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = (type === 's' ? 'OK ' : 'Error ') + msg;
+  t.className = 'toast show toast-' + type;
+  setTimeout(function() { t.classList.remove('show'); }, 4000);
+}
+async function doL() {
+  var e = document.getElementById('lE').value.trim();
+  var p = document.getElementById('lP').value;
+  if (!e || !p) { showToast('Enter email and password', 'e'); return; }
+  sl('lB', 'lS', true);
+  try {
+    var r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e, password: p }) });
+    var d = await r.json();
+    if (d.success) { showToast('Welcome ' + d.name, 's'); setTimeout(function() { location.href = d.redirect; }, 700); }
+    else { showToast(d.message, 'e'); sl('lB', 'lS', false); }
+  } catch(err) { showToast('Connection error', 'e'); sl('lB', 'lS', false); }
+}
+async function doR() {
+  var n = document.getElementById('rN').value.trim();
+  var e = document.getElementById('rE').value.trim();
+  var p = document.getElementById('rP').value;
+  if (!n || !e || !p) { showToast('All fields required', 'e'); return; }
+  if (p.length < 8) { showToast('Password must be 8+ chars', 'e'); return; }
+  sl('rB', 'rS', true);
+  try {
+    var r = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: n, email: e, password: p }) });
+    var d = await r.json();
+    if (d.success) { showToast('Welcome ' + d.name, 's'); setTimeout(function() { location.href = d.redirect; }, 700); }
+    else { showToast(d.message, 'e'); sl('rB', 'rS', false); }
+  } catch(err) { showToast('Connection error', 'e'); sl('rB', 'rS', false); }
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Enter') { at === 'l' ? doL() : doR(); } });
+</script></body></html>
