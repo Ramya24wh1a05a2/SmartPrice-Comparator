@@ -1,90 +1,182 @@
-# SmartPrice - Live Price Comparison & Price-Drop Alerts
-Node.js + Express + MySQL
+# SmartPrice: Intelligent Price Comparison and Price-Drop Alert System
 
-Search any product, see live prices from Indian stores, find the cheapest, and get an email when the price drops to your target.
+SmartPrice helps shoppers compare product listings and prices across Indian online stores, identify potential deals, and receive email alerts when prices reach their target.
 
-## 1. One-time setup (Windows)
+Built using **Node.js, Express.js, MySQL, and SerpAPI**.
 
-**Install Node.js (LTS)** from https://nodejs.org
+## Highlights
 
-**Install MySQL**
-1. Download "MySQL Installer" from https://dev.mysql.com/downloads/installer/ (or use XAMPP / WAMP, which include MySQL).
-2. Install "MySQL Server". Set a root password and remember it.
-3. Check it is running: open Services (Win+R, `services.msc`) and look for "MySQL80" = Running.
+- **Live price comparison** using Google Shopping results through SerpAPI.
+- **Direct store links** to verify product listings and prices before purchasing.
+- **Automated price-drop alerts** using scheduled background jobs and email notifications.
+- **Price history tracking** with MySQL and interactive charts.
+- **Transparent price data** with live listings and stored reference prices clearly distinguished.
 
-## 2. Run the project
-    cd smartprice-node
-    npm install
-    copy .env.example .env      (Mac/Linux: cp .env.example .env)
+## Features
 
-Open `.env` and set at least:
-- `DB_PASSWORD` = your MySQL root password
-- `SESSION_SECRET` = any long random text
-- `SERPAPI_KEY` = free key from https://serpapi.com (needed for live prices of any product)
-- `EMAIL_ENABLED=false` while testing (so no real emails are sent)
+- Highlights the cheapest available listing and calculates potential savings.
+- Displays product listings, store details, and a Buy Score.
+- Interactive charts for price history, current store prices, and prototype forecasts.
+- User registration, login, and session-based authentication.
+- Price alerts with email notifications.
+- 60-minute caching to reduce API calls and improve performance.
+- Stored reference prices as a fallback when live data is unavailable.
 
-Then:
-    npm start
-Open http://localhost:5000 and register an account. The database `smartprice` and all tables are created automatically.
+## Tech Stack
 
-## 3. Tech stack
-| Part | Technology |
+| Area | Technology |
 |---|---|
-| Server / REST API | Node.js, Express |
-| Database | MySQL (mysql2 connection pool, async/await) |
-| Login | bcryptjs password hashing + signed cookie sessions |
-| Live prices | SerpAPI Google Shopping (third-party API), 60-minute cache |
-| Background job | node-cron (checks price alerts) |
-| Email | Nodemailer (Gmail SMTP) |
-| Frontend | HTML, CSS, vanilla JS, Chart.js |
+| Backend | Node.js, Express.js |
+| Database | MySQL, mysql2 |
+| Authentication | bcryptjs, cookie-session |
+| Live price listings | SerpAPI, Google Shopping |
+| Background jobs | node-cron |
+| Email notifications | Nodemailer, Gmail SMTP |
+| Frontend | HTML, CSS, JavaScript |
+| Charts | Chart.js |
+| Configuration | dotenv |
 
-## 4. SQL tables
-| Table | Purpose |
-|---|---|
-| users | accounts (bcrypt hash, unique email) |
-| products, platform_prices | stored reference prices (fallback only); platform_prices.product_id is a foreign key |
-| price_alerts | user's target prices; fulfilled flag; foreign key to users |
-| search_history | what each user searched |
-| price_history | every live price fetched (product, store, price, time). Powers the real history chart |
+## How It Works
 
-## 5. How prices work (be honest about this in interviews)
-1. The user searches. The app asks the live price API for real listings.
-2. Listings are filtered: the title must match the search and extreme prices (cases, bundles) are dropped. The cheapest listing per store is kept.
-3. If live data is unavailable, stored reference prices are used for known products and are marked "DB".
-4. For unknown products with no live data, the app shows NO price (it never invents one).
-5. Every fresh live lookup is saved in `price_history`. After 2+ days of data, the history chart shows REAL recorded prices instead of a simulation.
-6. The forecast and BUY NOW / WAIT recommendation are still a simulation (trend + weekly cycle + sale dips), not a trained ML model.
-7. Prices can differ slightly by seller, pincode and bank offers. Each store row has a link so users can verify.
-8. Buy links open the STORE itself, never Google: the store's direct product page when available, otherwise that store's own search page for the exact product title.
+1. The user searches for a product through the web interface.
+2. Express.js handles the request and verifies the user's session.
+3. SerpAPI retrieves available Google Shopping listings.
+4. The application filters listings, removes price outliers, and selects the cheapest listing per store.
+5. If live results are unavailable, stored reference prices may be displayed with a clear label.
+6. Retrieved live prices are saved in MySQL for price history.
+7. Users can view price comparisons, charts, and prototype forecasts.
+8. A scheduled background job checks price alerts and sends email notifications when the configured target is reached.
 
-## 6. Price-drop alerts
-- User sets a target price on the dashboard -> saved in `price_alerts`, confirmation email sent.
-- A node-cron job (default every 6 hours, change `ALERT_CRON`) re-checks each product once, and emails the user when the best price is at or below the target. The alert is then marked fulfilled so it is never emailed twice.
-- To trigger it manually while testing: send `POST /api/check_alerts` while logged in.
-- Each re-check uses one live-price lookup per product, so mind your SerpAPI free quota.
+## Reliability and Limitations
 
-## 7. API routes
-    POST /api/register       POST /api/login       POST /api/logout
-    POST /api/search         POST /api/price_alert GET  /api/my_alerts
-    POST /api/check_alerts   GET  /api/cache_stats GET  /api/test_email
+- Product relevance filtering helps remove unrelated listings.
+- Price outlier filtering helps exclude suspiciously priced accessories and bundles.
+- Live prices and stored reference prices are labelled separately.
+- Direct store links allow users to verify listings before purchasing.
+- Price history uses saved data when sufficient records are available; simulated history is labelled accordingly.
+- Price forecasts are experimental and are not guaranteed to predict future prices accurately.
+- Final prices may vary based on seller, product variant, delivery location, and available offers.
 
-## 8. Project structure
-    server.js                 Express app and routes
-    db.js                     MySQL pool, creates database/tables, seeds data, all queries
-    schema.sql                CREATE TABLE statements
-    useful_queries.sql        example SQL (joins, GROUP BY) to practise / show in interviews
-    data/products_seed.json   stored reference products
-    services/live.js          live price API + cache + result filtering
-    services/pricing.js       decides which prices can honestly be shown; saves price_history
-    services/history.js       builds real history series from SQL
-    services/alerts.js        node-cron alert checker
-    services/matcher.js       product matching, buy score
-    services/forecast.js      simulated forecast
-    services/mailer.js        emails
-    public/                   login.html, dashboard.html
+## Database
 
-## 9. Troubleshooting
-- "Could not connect to MySQL": MySQL is not running, or DB_PASSWORD / DB_USER in `.env` is wrong.
-- `npm install` says package.json not found: you are in the wrong folder; `cd` into the inner `smartprice-node` folder.
-- "No accurate prices available": SERPAPI_KEY is missing/invalid, or the product name is too vague.
-- Port busy: set `PORT=3000` in `.env`.
+The application uses MySQL to store user accounts, product reference prices, price alerts, search history, and price history.
+
+The database schema is provided in `schema.sql`, with example queries in `useful_queries.sql`.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or newer
+- MySQL Server
+- A SerpAPI API key for live product listings
+- Gmail App Password if email notifications are enabled
+
+### Installation
+
+Clone your repository and install the dependencies:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/smartprice.git
+cd smartprice
+npm install
+```
+
+Create your environment file.
+
+**Windows:**
+
+```powershell
+copy .env.example .env
+```
+
+Edit `.env` and configure the required settings:
+
+```env
+PORT=5000
+SESSION_SECRET=your_long_random_secret
+
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=your_mysql_username
+DB_PASSWORD=your_mysql_password
+DB_NAME=smartprice
+
+SERPAPI_KEY=your_serpapi_key
+
+EMAIL_ENABLED=false
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_gmail_app_password
+EMAIL_FROM=SmartPrice
+```
+
+Use your actual credentials locally. Never commit `.env` or expose API keys and passwords in your repository.
+
+Start the application:
+
+```bash
+npm start
+```
+
+Open [http://localhost:5000](http://localhost:5000) and register an account.
+
+*Note: Database creation and table initialization depend on the application's implemented startup logic.*
+
+## API Routes
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/register` | Register a user |
+| POST | `/api/login` | Log in |
+| POST | `/api/logout` | Log out |
+| POST | `/api/search` | Compare product prices |
+| POST | `/api/price_alert` | Create a price alert |
+| GET | `/api/my_alerts` | View personal alerts |
+| POST | `/api/check_alerts` | Trigger an alert check for testing |
+| GET | `/api/cache_stats` | View price cache statistics |
+| GET | `/api/test_email` | Test email delivery |
+
+Protected routes require appropriate authentication. Administrative and testing endpoints should be secured before deployment.
+
+## Project Structure
+
+```text
+smartprice/
+├── server.js
+├── db.js
+├── schema.sql
+├── useful_queries.sql
+├── data/
+│   └── products_seed.json
+├── public/
+│   ├── login.html
+│   └── dashboard.html
+├── services/
+│   ├── live.js
+│   ├── pricing.js
+│   ├── history.js
+│   ├── alerts.js
+│   ├── matcher.js
+│   ├── forecast.js
+│   └── mailer.js
+├── .env.example
+├── .gitignore
+└── package.json
+```
+
+## Future Improvements
+
+- Integrate official retailer APIs for more reliable pricing.
+- Improve product variant matching.
+- Train and evaluate a forecasting model using saved price history.
+- Add automated tests with Jest and Supertest.
+- Implement rate limiting and security headers.
+- Deploy the application using Render or Railway with a cloud database.
+
+## Author
+
+**V. Ramya**
+
+
